@@ -1,21 +1,24 @@
+from typing import Optional, List, Dict, Union
+
+
 class Product:
     """
     Класс для описания товара
     """
 
-    def __init__(self, name, description, price, quantity):
-        self.name = name
-        self.description = description
-        self.__price = price  # Приватный атрибут цены
-        self.quantity = quantity
+    def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
+        self.name: str = name
+        self.description: str = description
+        self.__price: float = price  # Приватный атрибут цены
+        self.quantity: int = quantity
 
     @property
-    def price(self):
+    def price(self) -> float:
         """Геттер для цены"""
         return self.__price
 
     @price.setter
-    def price(self, new_price):
+    def price(self, new_price: float) -> None:
         """Сеттер для цены с проверкой на положительное значение"""
         if new_price <= 0:
             print("Цена не должна быть нулевая или отрицательная")
@@ -23,15 +26,15 @@ class Product:
             self.__price = new_price
 
     @classmethod
-    def new_product(cls, product_data):
+    def new_product(cls, product_data: Dict[str, Union[str, float, int]]) -> "Product":
         """
         Класс-метод для создания продукта из словаря
         """
         return cls(
-            product_data['name'],
-            product_data['description'],
-            product_data['price'],
-            product_data['quantity']
+            str(product_data["name"]),
+            str(product_data["description"]),
+            float(product_data["price"]),
+            int(product_data["quantity"]),
         )
 
 
@@ -39,18 +42,19 @@ class Category:
     """
     Класс для описания категории товаров
     """
-    category_count = 0  # Счетчик категорий
-    product_count = 0  # Счетчик продуктов
 
-    def __init__(self, name, description, products=None):
-        self.name = name
-        self.description = description
-        self.__products = products if products else []  # Приватный атрибут списка товаров
+    category_count: int = 0  # Счетчик категорий
+    product_count: int = 0  # Счетчик продуктов
+
+    def __init__(self, name: str, description: str, products: Optional[List[Product]] = None) -> None:
+        self.name: str = name
+        self.description: str = description
+        self.__products: List[Product] = products if products else []  # Приватный атрибут списка товаров
         Category.category_count += 1
         if products:
             Category.product_count += len(products)
 
-    def add_product(self, product):
+    def add_product(self, product: Product) -> None:
         """
         Метод для добавления продукта в категорию
         """
@@ -58,12 +62,12 @@ class Category:
         Category.product_count += 1
 
     @property
-    def products(self):
+    def products(self) -> str:
         """
         Геттер для получения списка продуктов в виде строки
         Формат: "Название продукта, X руб. Остаток: X шт.\n"
         """
-        result = ""
+        result: str = ""
         for product in self.__products:
             result += f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n"
         return result
@@ -71,15 +75,15 @@ class Category:
 
 if __name__ == "__main__":
     # Создаем продукты
-    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
-    product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
+    product1: Product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+    product2: Product = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+    product3: Product = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
 
     # Создаем категорию с продуктами
-    category1 = Category(
+    category1: Category = Category(
         "Смартфоны",
         "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
-        [product1, product2, product3]
+        [product1, product2, product3],
     )
 
     # Выводим продукты через геттер
@@ -87,7 +91,7 @@ if __name__ == "__main__":
     print(category1.products)
 
     # Добавляем новый продукт
-    product4 = Product("55\" QLED 4K", "Фоновая подсветка", 123000.0, 7)
+    product4: Product = Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)
     category1.add_product(product4)
 
     print("\nПосле добавления нового продукта:")
@@ -97,11 +101,13 @@ if __name__ == "__main__":
     print(f"Общее количество продуктов во всех категориях: {Category.product_count}")
 
     # Создаем новый продукт через класс-метод
-    new_product = Product.new_product(
-        {"name": "Samsung Galaxy S23 Ultra",
-         "description": "256GB, Серый цвет, 200MP камера",
-         "price": 180000.0,
-         "quantity": 5}
+    new_product: Product = Product.new_product(
+        {
+            "name": "Samsung Galaxy S23 Ultra",
+            "description": "256GB, Серый цвет, 200MP камера",
+            "price": 180000.0,
+            "quantity": 5,
+        }
     )
 
     print("\nНовый продукт, созданный через класс-метод:")
