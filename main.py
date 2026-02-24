@@ -1,83 +1,126 @@
-"""
-Модуль для работы с товарами и категориями интернет-магазина
-"""
-
 class Product:
-    """Класс для представления товара"""
+    """
+    Класс для описания товара
+    """
 
-    def __init__(self, name: str, description: str, price: float, quantity: int):
+    def __init__(self, name, description, price, quantity):
         self.name = name
         self.description = description
-        self.price = price
+        self.__price = price  # Приватный атрибут цены
         self.quantity = quantity
+
+    @property
+    def price(self):
+        """Геттер для цены"""
+        return self.__price
+
+    @price.setter
+    def price(self, new_price):
+        """Сеттер для цены с проверкой на положительное значение"""
+        if new_price <= 0:
+            print("Цена не должна быть нулевая или отрицательная")
+        else:
+            self.__price = new_price
+
+    @classmethod
+    def new_product(cls, product_data):
+        """
+        Класс-метод для создания продукта из словаря
+        """
+        return cls(
+            product_data['name'],
+            product_data['description'],
+            product_data['price'],
+            product_data['quantity']
+        )
 
 
 class Category:
-    """Класс для представления категории товаров"""
-    category_count: int = 0  # Количество категорий
-    product_count: int = 0   # Количество товаров
+    """
+    Класс для описания категории товаров
+    """
+    category_count = 0  # Счетчик категорий
+    product_count = 0  # Счетчик продуктов
 
-    def __init__(self, name: str, description: str, products: list = None):
+    def __init__(self, name, description, products=None):
         self.name = name
         self.description = description
-        self.products = products if products is not None else []
-
+        self.__products = products if products else []  # Приватный атрибут списка товаров
         Category.category_count += 1
-        Category.product_count += len(self.products)
+        if products:
+            Category.product_count += len(products)
+
+    def add_product(self, product):
+        """
+        Метод для добавления продукта в категорию
+        """
+        self.__products.append(product)
+        Category.product_count += 1
+
+    @property
+    def products(self):
+        """
+        Геттер для получения списка продуктов в виде строки
+        Формат: "Название продукта, X руб. Остаток: X шт.\n"
+        """
+        result = ""
+        for product in self.__products:
+            result += f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n"
+        return result
 
 
 if __name__ == "__main__":
-    # Создание продуктов
-    product1 = Product("Samsung Galaxy S23 Ultra",
-                      "256GB, Серый цвет, 200MP камера",
-                      180000.0, 5)
-    product2 = Product("Iphone 15",
-                      "512GB, Gray space",
-                      210000.0, 8)
-    product3 = Product("Xiaomi Redmi Note 11",
-                      "1024GB, Синий",
-                      31000.0, 14)
+    # Создаем продукты
+    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+    product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
 
-    # Вывод информации о продуктах
-    print(product1.name)
-    print(product1.description)
-    print(product1.price)
-    print(product1.quantity)
+    # Создаем категорию с продуктами
+    category1 = Category(
+        "Смартфоны",
+        "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
+        [product1, product2, product3]
+    )
 
-    print(product2.name)
-    print(product2.description)
-    print(product2.price)
-    print(product2.quantity)
+    # Выводим продукты через геттер
+    print("Продукты в категории:")
+    print(category1.products)
 
-    print(product3.name)
-    print(product3.description)
-    print(product3.price)
-    print(product3.quantity)
+    # Добавляем новый продукт
+    product4 = Product("55\" QLED 4K", "Фоновая подсветка", 123000.0, 7)
+    category1.add_product(product4)
 
-    # Создание первой категории
-    category1 = Category("Смартфоны",
-                        "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
-                        [product1, product2, product3])
+    print("\nПосле добавления нового продукта:")
+    print(category1.products)
 
-    print(category1.name == "Смартфоны")
-    print(category1.description)
-    print(len(category1.products))
-    print(category1.category_count)
-    print(category1.product_count)
+    # Выводим общее количество продуктов во всех категориях
+    print(f"Общее количество продуктов во всех категориях: {Category.product_count}")
 
-    # Создание второй категории
-    product4 = Product("55\" QLED 4K",
-                      "Фоновая подсветка",
-                      123000.0, 7)
-    category2 = Category("Телевизоры",
-                        "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
-                        [product4])
+    # Создаем новый продукт через класс-метод
+    new_product = Product.new_product(
+        {"name": "Samsung Galaxy S23 Ultra",
+         "description": "256GB, Серый цвет, 200MP камера",
+         "price": 180000.0,
+         "quantity": 5}
+    )
 
-    print(category2.name)
-    print(category2.description)
-    print(len(category2.products))
-    print(category2.products)
+    print("\nНовый продукт, созданный через класс-метод:")
+    print(f"Название: {new_product.name}")
+    print(f"Описание: {new_product.description}")
+    print(f"Цена: {new_product.price}")
+    print(f"Количество: {new_product.quantity}")
 
-    # Вывод общих счетчиков
-    print(Category.category_count)
-    print(Category.product_count)
+    # Тестируем сеттер цены
+    print("\nТестирование сеттера цены:")
+    new_product.price = 800
+    print(f"Цена после изменения: {new_product.price}")
+
+    # Попытка установить отрицательную цену
+    print("\nПопытка установить отрицательную цену -100:")
+    new_product.price = -100
+    print(f"Цена после попытки: {new_product.price}")
+
+    # Попытка установить нулевую цену
+    print("\nПопытка установить нулевую цену:")
+    new_product.price = 0
+    print(f"Цена после попытки: {new_product.price}")
