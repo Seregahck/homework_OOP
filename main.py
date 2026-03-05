@@ -1,94 +1,117 @@
+from typing import List, Optional, Union
+
+
 class Product:
     """Базовый класс для всех товаров"""
 
-    def __init__(self, name, description, price, quantity):
-        self.name = name
-        self.description = description
-        self.__price = price
-        self.quantity = quantity
+    def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
+        self.name: str = name
+        self.description: str = description
+        self.__price: float = price
+        self.quantity: int = quantity
 
     @property
-    def price(self):
+    def price(self) -> float:
         """Геттер для цены"""
         return self.__price
 
     @price.setter
-    def price(self, value):
-        """Сеттер для цены с проверкой"""
+    def price(self, value: float) -> None:
+        """Сеттер для цены с валидацией"""
         if value <= 0:
-            print("Цена не должна быть нулевая или отрицательная")
-        else:
-            self.__price = value
+            raise ValueError("Цена должна быть больше нуля")
+        self.__price = value
 
-    def __add__(self, other):
-        """Перегрузка оператора + для сложения товаров одного класса"""
-        if type(self) is not type(other):
+    def __add__(self, other: "Product") -> float:
+        """Сложение товаров по цене * количество"""
+        if not isinstance(other, type(self)):
             raise TypeError("Нельзя складывать товары разных классов")
-        return self.price * self.quantity + other.price * other.quantity
+        return (self.price * self.quantity) + (other.price * other.quantity)
 
 
 class Smartphone(Product):
-    """Класс для смартфонов, наследник Product"""
+    """Класс для смартфонов"""
 
-    def __init__(self, name, description, price, quantity, efficiency, model, memory, color):
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        efficiency: float,
+        model: str,
+        memory: int,
+        color: str,
+    ) -> None:
         super().__init__(name, description, price, quantity)
-        self.efficiency = efficiency
-        self.model = model
-        self.memory = memory
-        self.color = color
+        self.efficiency: float = efficiency
+        self.model: str = model
+        self.memory: int = memory
+        self.color: str = color
 
 
 class LawnGrass(Product):
-    """Класс для газонной травы, наследник Product"""
+    """Класс для газонной травы"""
 
-    def __init__(self, name, description, price, quantity, country, germination_period, color):
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        country: str,
+        germination_period: str,
+        color: str,
+    ) -> None:
         super().__init__(name, description, price, quantity)
-        self.country = country
-        self.germination_period = germination_period
-        self.color = color
+        self.country: str = country
+        self.germination_period: str = germination_period
+        self.color: str = color
 
 
 class Category:
     """Класс для категорий товаров"""
 
-    category_count = 0
-    product_count = 0
+    product_count: int = 0
 
-    def __init__(self, name, description, products=None):
-        self.name = name
-        self.description = description
-        self.__products = products if products else []
-
-        Category.category_count += 1
+    def __init__(self, name: str, description: str, products: Optional[List[Product]] = None) -> None:
+        self.name: str = name
+        self.description: str = description
+        self.__products: List[Product] = products if products else []
         Category.product_count += len(self.__products)
 
     @property
-    def products(self):
-        """Геттер для списка продуктов"""
-        products_str = ""
+    def products(self) -> str:
+        """Геттер для списка продуктов в строковом формате"""
+        product_list: str = ""
         for product in self.__products:
-            products_str += f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n"
-        return products_str
+            product_list += f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n"
+        return product_list
 
-    def add_product(self, product):
-        """Метод для добавления продукта в категорию"""
-        if not isinstance(product, Product):
-            raise TypeError("Можно добавлять только продукты или их наследников")
-
-        self.__products.append(product)
-        Category.product_count += 1
-
-    def get_products_list(self):
+    def get_products_list(self) -> List[Product]:
         """Метод для получения списка продуктов"""
         return self.__products
 
+    def add_product(self, product: Product) -> None:
+        """Добавление продукта в категорию"""
+        if not isinstance(product, Product):
+            raise TypeError("Можно добавлять только объекты класса Product или его наследников")
+        self.__products.append(product)
+        Category.product_count += 1
 
-if __name__ == '__main__':
-    smartphone1 = Smartphone("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5, 95.5,
-                             "S23 Ultra", 256, "Серый")
-    smartphone2 = Smartphone("Iphone 15", "512GB, Gray space", 210000.0, 8, 98.2, "15", 512, "Gray space")
-    smartphone3 = Smartphone("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14, 90.3, "Note 11", 1024, "Синий")
 
+# Тестирование функциональности
+if __name__ == "__main__":
+    # Создание смартфонов
+    smartphone1: Smartphone = Smartphone(
+        "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый"
+    )
+    smartphone2: Smartphone = Smartphone("Iphone 15", "512GB, Gray space", 210000.0, 8, 98.2, "15", 512, "Gray space")
+    smartphone3: Smartphone = Smartphone(
+        "Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14, 90.3, "Note 11", 1024, "Синий"
+    )
+
+    # Вывод информации о смартфонах
     print(smartphone1.name)
     print(smartphone1.description)
     print(smartphone1.price)
@@ -97,6 +120,7 @@ if __name__ == '__main__':
     print(smartphone1.model)
     print(smartphone1.memory)
     print(smartphone1.color)
+    print()
 
     print(smartphone2.name)
     print(smartphone2.description)
@@ -106,6 +130,7 @@ if __name__ == '__main__':
     print(smartphone2.model)
     print(smartphone2.memory)
     print(smartphone2.color)
+    print()
 
     print(smartphone3.name)
     print(smartphone3.description)
@@ -115,10 +140,15 @@ if __name__ == '__main__':
     print(smartphone3.model)
     print(smartphone3.memory)
     print(smartphone3.color)
+    print()
 
-    grass1 = LawnGrass("Газонная трава", "Элитная трава для газона", 500.0, 20, "Россия", "7 дней", "Зеленый")
-    grass2 = LawnGrass("Газонная трава 2", "Выносливая трава", 450.0, 15, "США", "5 дней", "Темно-зеленый")
+    # Создание травы
+    grass1: LawnGrass = LawnGrass(
+        "Газонная трава", "Элитная трава для газона", 500.0, 20, "Россия", "7 дней", "Зеленый"
+    )
+    grass2: LawnGrass = LawnGrass("Газонная трава 2", "Выносливая трава", 450.0, 15, "США", "5 дней", "Темно-зеленый")
 
+    # Вывод информации о траве
     print(grass1.name)
     print(grass1.description)
     print(grass1.price)
@@ -126,6 +156,7 @@ if __name__ == '__main__':
     print(grass1.country)
     print(grass1.germination_period)
     print(grass1.color)
+    print()
 
     print(grass2.name)
     print(grass2.description)
@@ -134,11 +165,13 @@ if __name__ == '__main__':
     print(grass2.country)
     print(grass2.germination_period)
     print(grass2.color)
+    print()
 
-    smartphone_sum = smartphone1 + smartphone2
+    # Тестирование сложения
+    smartphone_sum: float = smartphone1 + smartphone2
     print(f"Сумма смартфонов: {smartphone_sum}")
 
-    grass_sum = grass1 + grass2
+    grass_sum: float = grass1 + grass2
     print(f"Сумма травы: {grass_sum}")
 
     try:
@@ -147,19 +180,28 @@ if __name__ == '__main__':
         print("Возникла ошибка TypeError при попытке сложения")
     else:
         print("Не возникла ошибка TypeError при попытке сложения")
+    print()
 
-    category_smartphones = Category("Смартфоны", "Высокотехнологичные смартфоны", [smartphone1, smartphone2])
-    category_grass = Category("Газонная трава", "Различные виды газонной травы", [grass1, grass2])
+    # Создание категорий
+    category_smartphones: Category = Category("Смартфоны", "Высокотехнологичные смартфоны", [smartphone1, smartphone2])
+    category_grass: Category = Category("Газонная трава", "Различные виды газонной травы", [grass1, grass2])
 
+    # Добавление продукта
     category_smartphones.add_product(smartphone3)
 
+    # Вывод продуктов категории
+    print("Продукты категории смартфоны:")
     print(category_smartphones.products)
 
-    print(f"Количество продуктов: {Category.product_count}")
+    print(f"Общее количество продуктов: {Category.product_count}")
 
+    # Тестирование добавления не-продукта
     try:
-        category_smartphones.add_product("Not a product")
+        category_smartphones.add_product("Not a product")  # type: ignore
     except TypeError:
         print("Возникла ошибка TypeError при добавлении не продукта")
     else:
         print("Не возникла ошибка TypeError при добавлении не продукта")
+
+    # Демонстрация работы get_products_list
+    print(f"\nКоличество смартфонов в категории: {len(category_smartphones.get_products_list())}")

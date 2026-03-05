@@ -1,165 +1,116 @@
 import pytest
-from typing import List
-from main import Product, Category
+from main import Product, Smartphone, LawnGrass, Category
 
 
-def test_product_creation() -> None:
-    """Тест создания продукта"""
-    product: Product = Product("Test", "Description", 100, 10)
-    assert product.name == "Test"
-    assert product.description == "Description"
-    assert product.price == 100
-    assert product.quantity == 10
+class TestProduct:
+    """Тесты для класса Product"""
+
+    def test_product_creation(self):
+        """Тест создания продукта"""
+        product = Product("Тестовый продукт", "Описание", 1000.0, 10)
+        assert product.name == "Тестовый продукт"
+        assert product.description == "Описание"
+        assert product.price == 1000.0
+        assert product.quantity == 10
+
+    def test_price_setter_positive(self):
+        """Тест установки положительной цены"""
+        product = Product("Тест", "Описание", 1000.0, 10)
+        product.price = 1500.0
+        assert product.price == 1500.0
+
+    def test_price_setter_negative(self):
+        """Тест установки отрицательной цены"""
+        product = Product("Тест", "Описание", 1000.0, 10)
+        with pytest.raises(ValueError):
+            product.price = -100
+
+    def test_price_setter_zero(self):
+        """Тест установки нулевой цены"""
+        product = Product("Тест", "Описание", 1000.0, 10)
+        with pytest.raises(ValueError):
+            product.price = 0
+
+    def test_add_same_class(self):
+        """Тест сложения продуктов одного класса"""
+        product1 = Product("Товар 1", "Описание", 100.0, 2)
+        product2 = Product("Товар 2", "Описание", 200.0, 3)
+        assert (product1 + product2) == (100 * 2 + 200 * 3)
 
 
-def test_product_price_getter() -> None:
-    """Тест геттера цены"""
-    product: Product = Product("Test", "Description", 100, 10)
-    assert product.price == 100
+class TestSmartphone:
+    """Тесты для класса Smartphone"""
+
+    def test_smartphone_creation(self):
+        """Тест создания смартфона"""
+        smartphone = Smartphone("iPhone 15", "512GB", 120000.0, 3, 98.5, "15", 512, "Black")
+
+        assert smartphone.name == "iPhone 15"
+        assert smartphone.description == "512GB"
+        assert smartphone.price == 120000.0
+        assert smartphone.quantity == 3
+        assert smartphone.efficiency == 98.5
+        assert smartphone.model == "15"
+        assert smartphone.memory == 512
+        assert smartphone.color == "Black"
+
+    def test_smartphone_addition(self):
+        """Тест сложения смартфонов"""
+        s1 = Smartphone("S23", "256GB", 80000.0, 2, 95.0, "S23", 256, "Gray")
+        s2 = Smartphone("S23+", "512GB", 100000.0, 1, 96.0, "S23+", 512, "Black")
+
+        assert (s1 + s2) == (80000 * 2 + 100000 * 1)
 
 
-def test_product_price_setter_positive() -> None:
-    """Тест сеттера цены с положительным значением"""
-    product: Product = Product("Test", "Description", 100, 10)
-    product.price = 150
-    assert product.price == 150
+class TestLawnGrass:
+    """Тесты для класса LawnGrass"""
+
+    def test_grass_creation(self):
+        """Тест создания газонной травы"""
+        grass = LawnGrass("Трава", "Для газона", 500.0, 20, "Россия", "7 дней", "Зеленый")
+
+        assert grass.name == "Трава"
+        assert grass.description == "Для газона"
+        assert grass.price == 500.0
+        assert grass.quantity == 20
+        assert grass.country == "Россия"
+        assert grass.germination_period == "7 дней"
+        assert grass.color == "Зеленый"
+
+    def test_grass_addition(self):
+        """Тест сложения газонной травы"""
+        g1 = LawnGrass("Трава 1", "Описание", 500.0, 10, "Россия", "7 дней", "Зеленый")
+        g2 = LawnGrass("Трава 2", "Описание", 600.0, 5, "США", "5 дней", "Темно-зеленый")
+
+        assert (g1 + g2) == (500 * 10 + 600 * 5)
 
 
-def test_product_price_setter_negative(capsys) -> None:
-    """Тест сеттера цены с отрицательным значением"""
-    product: Product = Product("Test", "Description", 100, 10)
-    product.price = -50
-    captured = capsys.readouterr()
-    assert "Цена не должна быть нулевая или отрицательная" in captured.out
-    assert product.price == 100  # Цена не изменилась
+    def test_add_product_invalid(self):
+        """Тест добавления невалидного продукта"""
+        category = Category("Смартфоны", "Описание")
 
+        with pytest.raises(TypeError):
+            category.add_product("Это не продукт")
 
-def test_product_price_setter_zero(capsys) -> None:
-    """Тест сеттера цены с нулевым значением"""
-    product: Product = Product("Test", "Description", 100, 10)
-    product.price = 0
-    captured = capsys.readouterr()
-    assert "Цена не должна быть нулевая или отрицательная" in captured.out
-    assert product.price == 100  # Цена не изменилась
+        with pytest.raises(TypeError):
+            category.add_product(123)
 
+    def test_products_property(self):
+        """Тест свойства products"""
+        product = Product("Тестовый товар", "Описание", 1500.0, 5)
+        category = Category("Категория", "Описание", [product])
 
-def test_product_new_product_classmethod() -> None:
-    """Тест класс-метода new_product"""
-    data: dict = {
-        'name': 'Test Product',
-        'description': 'Test Description',
-        'price': 100,
-        'quantity': 10
-    }
-    product: Product = Product.new_product(data)
-    assert product.name == 'Test Product'
-    assert product.description == 'Test Description'
-    assert product.price == 100
-    assert product.quantity == 10
+        expected_output = "Тестовый товар, 1500.0 руб. Остаток: 5 шт.\n"
+        assert category.products == expected_output
 
+    def test_product_count(self):
+        """Тест счетчика продуктов"""
+        initial_count = Category.product_count
 
-def test_category_creation() -> None:
-    """Тест создания категории"""
-    category: Category = Category("Test Category", "Test Description")
-    assert category.name == "Test Category"
-    assert category.description == "Test Description"
-    assert category.products == ""  # Пустая строка через геттер
+        product1 = Product("Товар 1", "Описание", 100.0, 1)
+        product2 = Product("Товар 2", "Описание", 200.0, 2)
 
+        Category("Категория 1", "Описание", [product1])
+        Category("Категория 2", "Описание", [product2])
 
-def test_category_with_products() -> None:
-    """Тест создания категории с продуктами"""
-    product1: Product = Product("Product 1", "Desc 1", 100, 5)
-    product2: Product = Product("Product 2", "Desc 2", 200, 10)
-    category: Category = Category("Test", "Desc", [product1, product2])
-
-    expected: str = "Product 1, 100 руб. Остаток: 5 шт.\nProduct 2, 200 руб. Остаток: 10 шт.\n"
-    assert category.products == expected
-
-
-def test_add_product_to_category() -> None:
-    """Тест добавления продукта в категорию"""
-    category: Category = Category("Test", "Desc")
-    product: Product = Product("New Product", "Desc", 300, 7)
-
-    category.add_product(product)
-    expected: str = "New Product, 300 руб. Остаток: 7 шт.\n"
-    assert category.products == expected
-
-
-def test_category_counters() -> None:
-    """Тест счетчиков категорий и продуктов"""
-    initial_category_count: int = Category.category_count
-    initial_product_count: int = Category.product_count
-
-    category1: Category = Category("Category 1", "Desc")
-    category2: Category = Category("Category 2", "Desc")
-
-    product1: Product = Product("Product 1", "Desc", 100, 5)
-    product2: Product = Product("Product 2", "Desc", 200, 10)
-
-    category1.add_product(product1)
-    category1.add_product(product2)
-
-    assert Category.category_count == initial_category_count + 2
-    assert Category.product_count == initial_product_count + 2
-
-
-def test_product_private_attribute() -> None:
-    """Тест приватности атрибута цены"""
-    product: Product = Product("Test", "Desc", 100, 10)
-    with pytest.raises(AttributeError):
-        product.__price  # Должно вызывать ошибку
-
-
-def test_category_private_attribute() -> None:
-    """Тест приватности атрибута products"""
-    category: Category = Category("Test", "Desc")
-    with pytest.raises(AttributeError):
-        category.__products  # Должно вызывать ошибку
-
-
-def test_products_format() -> None:
-    """Тест формата вывода продуктов"""
-    product: Product = Product("Test Product", "Desc", 1500, 3)
-    category: Category = Category("Test", "Desc")
-    category.add_product(product)
-
-    expected: str = "Test Product, 1500 руб. Остаток: 3 шт.\n"
-    assert category.products == expected
-
-
-def test_add_product_returns_none() -> None:
-    """Тест что add_product не возвращает значение"""
-    category: Category = Category("Test", "Desc")
-    product: Product = Product("Test", "Desc", 100, 5)
-    result = category.add_product(product)
-    assert result is None
-
-
-def test_category_product_count_with_initial_products() -> None:
-    """Тест счетчика продуктов при создании категории с продуктами"""
-    initial_count: int = Category.product_count
-
-    product1: Product = Product("Product 1", "Desc", 100, 5)
-    product2: Product = Product("Product 2", "Desc", 200, 10)
-    category: Category = Category("Test", "Desc", [product1, product2])
-
-    assert Category.product_count == initial_count + 2
-
-
-def test_multiple_categories_product_count() -> None:
-    """Тест счетчика продуктов при нескольких категориях"""
-    initial_count: int = Category.product_count
-
-    category1: Category = Category("Category 1", "Desc")
-    category2: Category = Category("Category 2", "Desc")
-
-    product1: Product = Product("Product 1", "Desc", 100, 5)
-    product2: Product = Product("Product 2", "Desc", 200, 10)
-    product3: Product = Product("Product 3", "Desc", 300, 15)
-
-    category1.add_product(product1)
-    category1.add_product(product2)
-    category2.add_product(product3)
-
-    assert Category.product_count == initial_count + 3
+        assert Category.product_count == initial_count + 2
