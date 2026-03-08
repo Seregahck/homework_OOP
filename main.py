@@ -24,7 +24,8 @@ class Product:
 
     def __add__(self, other: "Product") -> float:
         """Сложение товаров по цене * количество"""
-        if not isinstance(other, type(self)):
+        # Используем type() для проверки типов
+        if type(self) is not type(other):
             raise TypeError("Нельзя складывать товары разных классов")
         return (self.price * self.quantity) + (other.price * other.quantity)
 
@@ -94,7 +95,9 @@ class Category:
 
     def add_product(self, product: Product) -> None:
         """Добавление продукта в категорию"""
-        if not isinstance(product, Product):
+        # Используем type() для проверки, является ли объект экземпляром Product или его наследников
+        # Для проверки на принадлежность к классу или его наследникам используем issubclass()
+        if not issubclass(type(product), Product):
             raise TypeError("Можно добавлять только объекты класса Product или его наследников")
         self.__products.append(product)
         Category.product_count += 1
