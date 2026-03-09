@@ -5,7 +5,7 @@ class BaseProduct(ABC):
     """Абстрактный базовый класс для всех продуктов"""
 
     @abstractmethod
-    def __init__(self, name: str, description: str, price: float, quantity: int):
+    def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         """Абстрактный метод инициализации продукта"""
         pass
 
@@ -15,7 +15,7 @@ class BaseProduct(ABC):
         pass
 
     @abstractmethod
-    def set_price(self, price: float):
+    def set_price(self, price: float) -> None:
         """Абстрактный метод установки цены"""
         pass
 
@@ -25,6 +25,6 @@ class BaseProduct(ABC):
         pass
 
     @abstractmethod
-    def set_quantity(self, quantity: int):
+    def set_quantity(self, quantity: int) -> None:
         """Абстрактный метод установки количества"""
         pass
