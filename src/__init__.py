@@ -1,13 +1,6 @@
-from src.base_product import BaseProduct
-from src.mixins import ReprMixin
-from src.product import Product, Smartphone, LawnGrass
-from src.category import Category
+from src.repr_mixin import ReprMixin  # noqa: F401
+from src.product import Product  # noqa: F401
+from src.category import Category  # noqa: F401
 
-__all__ = [
-    'BaseProduct',
-    'ReprMixin',
-    'Product',
-    'Smartphone',
-    'LawnGrass',
-    'Category'
-]
+
+__all__ = ['ReprMixin', 'Product', 'Category']
